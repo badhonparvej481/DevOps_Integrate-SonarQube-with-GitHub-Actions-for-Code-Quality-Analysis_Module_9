@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rapidcompetitions-deployment
+  namespace: production
+  labels:
+    app: rapidcompetitions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rapidcompetitions
+  template:
+    metadata:
+      labels:
+        app: rapidcompetitions
+    spec:
+      containers:
+      - name: rapidcompetitions
+        image: badhonparvej481/rapidcompetitions:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: SECRET_KEY
+          value: "SECjs98jkdsoibp"
+        - name: DEBUG
+          value: "True"
+        - name: ALLOWED_HOSTS
+          value: "*"
+        - name: SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+          value: "dummy-google-key"
+        - name: SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
+          value: "dummy-google-secret"
+        - name: STRIPE_PUBLIC_KEY
+          value: "dummy-stripe-public-key"
+        - name: STRIPE_SECRET_KEY
+          value: "dummy-stripe-secret-key"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rapidcompetitions-service
+  namespace: production
+spec:
+  selector:
+    app: rapidcompetitions
+  ports:
+    - protocol: TCP
+      port: 31080        # Exposing port 80 for the service
+      targetPort: 31080 # The port your container is exposing internally
+      nodePort: 30200  # NodePort to access externally
+  type: NodePort

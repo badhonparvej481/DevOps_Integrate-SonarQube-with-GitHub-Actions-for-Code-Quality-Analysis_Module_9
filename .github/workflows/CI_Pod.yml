@@ -48,13 +48,13 @@ jobs:
 
       - name: Run SonarQube Scanner
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=Rapid-Competition \
+            -Dsonar.projectKey=rapid \
             -Dsonar.sources=. \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=rapid \
             -Dsonar.python.version=3.10
 
   build:

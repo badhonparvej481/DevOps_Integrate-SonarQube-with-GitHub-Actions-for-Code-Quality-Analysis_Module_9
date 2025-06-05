@@ -22,6 +22,38 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+  dependency-check:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download OWASP Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
+          unzip dependency-check-8.4.0-release.zip -d dependency-check
+
+      - name: Run Dependency-Check Scan
+        run: |
+          ./dependency-check/dependency-check/bin/dependency-check.sh \
+            --project "Rapid Project" \
+            --scan . \
+            --format "HTML" \
+            --out dependency-report
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: dependency-report
+
   sonarQube_analysis:
     needs: test
     runs-on: ubuntu-latest
@@ -67,38 +99,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-  dependency-check:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v3
-
-      - name: Install Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Download OWASP Dependency-Check
-        run: |
-          wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
-          unzip dependency-check-8.4.0-release.zip -d dependency-check
-
-      - name: Run Dependency-Check Scan
-        run: |
-          ./dependency-check/dependency-check/bin/dependency-check.sh \
-            --project "Rapid Project" \
-            --scan . \
-            --format "HTML" \
-            --out dependency-report
-
-      - name: Upload Dependency Check Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependency-check-report
-          path: dependency-report
 
   deploy:
     needs: [build, dependency-check]

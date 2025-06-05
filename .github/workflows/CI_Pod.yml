@@ -46,7 +46,7 @@ jobs:
             --project "Rapid Project" \
             --scan . \
             --format "HTML" \
-            --out dependency-report
+            --out dependency-report \
             --disableAssembly
 
       - name: Upload Dependency Check Report

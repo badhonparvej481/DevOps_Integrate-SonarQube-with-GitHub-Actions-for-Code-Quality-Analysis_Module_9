@@ -47,6 +47,7 @@ jobs:
             --scan . \
             --format "HTML" \
             --out dependency-report
+            --disableAssembly
 
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v4
